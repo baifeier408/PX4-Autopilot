@@ -398,3 +398,39 @@ PARAM_DEFINE_FLOAT(MC_ACRO_SUPEXPOY, 0.7f);
  * @group Multicopter Rate Control
  */
 PARAM_DEFINE_INT32(MC_BAT_SCALE_EN, 0);
+
+/* D9.7 RL residual injection test parameters */
+
+/**
+ * Enable RL residual body-rate injection
+ *
+ * 0: disabled, native PX4 behavior
+ * 1: add MC_RL_RES_P and MC_RL_RES_Q to nominal body-rate setpoints
+ *
+ * @boolean
+ * @group Multicopter Rate Control
+ */
+PARAM_DEFINE_INT32(MC_RL_RES_EN, 0);
+
+/**
+ * Roll-rate residual added after attitude control
+ *
+ * @unit rad/s
+ * @min -0.05
+ * @max 0.05
+ * @decimal 3
+ * @group Multicopter Rate Control
+ */
+PARAM_DEFINE_FLOAT(MC_RL_RES_P, 0.0f);
+
+/**
+ * Pitch-rate residual added after attitude control
+ *
+ * @unit rad/s
+ * @min -0.05
+ * @max 0.05
+ * @decimal 3
+ * @group Multicopter Rate Control
+ */
+PARAM_DEFINE_FLOAT(MC_RL_RES_Q, 0.0f);
+

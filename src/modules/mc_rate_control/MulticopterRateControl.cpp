@@ -183,6 +183,29 @@ MulticopterRateControl::Run()
 			}
 		}
 
+		// D9.7: keep the PX4 nominal rate setpoint untouched and apply
+		// a bounded residual only to the local copy used by the rate controller.
+		Vector3f rates_setpoint_for_control = _rates_setpoint;
+
+		if ((_param_mc_rl_res_en.get() != 0)
+		    && _vehicle_control_mode.flag_control_attitude_enabled) {
+
+			constexpr float residual_rate_limit = 0.05f;
+
+			const float residual_p = math::constrain(
+				_param_mc_rl_res_p.get(),
+				-residual_rate_limit,
+				 residual_rate_limit);
+
+			const float residual_q = math::constrain(
+				_param_mc_rl_res_q.get(),
+				-residual_rate_limit,
+				 residual_rate_limit);
+
+			rates_setpoint_for_control(0) += residual_p;
+			rates_setpoint_for_control(1) += residual_q;
+		}
+
 		// run the rate controller
 		if (_vehicle_control_mode.flag_control_rates_enabled) {
 
@@ -214,7 +237,7 @@ MulticopterRateControl::Run()
 			}
 
 			// run rate controller
-			const Vector3f att_control = _rate_control.update(rates, _rates_setpoint, angular_accel, dt, _maybe_landed || _landed);
+			const Vector3f att_control = _rate_control.update(rates, rates_setpoint_for_control, angular_accel, dt, _maybe_landed || _landed);
 
 			// publish rate controller status
 			rate_ctrl_status_s rate_ctrl_status{};
